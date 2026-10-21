@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import CalculatorButton from './CalculatorButton'
 import CalculationHistory, { type HistoryEntry } from './CalculationHistory'
 import CalculatorDisplay from './CalculatorDisplay'
+import ScientificCalculator from './ScientificCalculator'
+import FunctionCalculator from './FunctionCalculator'
+import type { AngleMode } from '../utils/mathEngine'
 import {
   applyPercent,
   evaluateTokens,
@@ -13,8 +16,12 @@ import { formatNumber } from '../utils/formatNumber'
 import './Calculator.css'
 
 type RepeatOperation = { operator: Operator; operand: number }
+type CalculatorMode = 'standard' | 'scientific' | 'function'
+const modeOrder = ['standard', 'scientific', 'function'] as const
 
 function Calculator() {
+  const [mode, setMode] = useState<CalculatorMode>('standard')
+  const [angleMode, setAngleMode] = useState<AngleMode>('degrees')
   const [tokens, setTokens] = useState<CalculatorToken[]>([])
   const [entry, setEntry] = useState('0')
   const [entryActive, setEntryActive] = useState(false)
@@ -28,6 +35,15 @@ function Calculator() {
   const [history, setHistory] = useState<HistoryEntry[]>([])
   const [historyOpen, setHistoryOpen] = useState(false)
   const historyId = useRef(0)
+
+  const addHistoryEntry = (calculation: string, value: number) => {
+    setHistory((current) =>
+      [
+        { id: ++historyId.current, expression: calculation, result: value },
+        ...current,
+      ].slice(0, 10),
+    )
+  }
 
   const numericValue = (value: string) => Number(value)
   const pendingOperator = (): Operator | undefined => {
@@ -172,16 +188,7 @@ function Calculator() {
         setExpression(repeatedExpression)
         setEntry(String(repeated))
         setResult(repeated)
-        setHistory((current) =>
-          [
-            {
-              id: ++historyId.current,
-              expression: repeatedExpression,
-              result: repeated,
-            },
-            ...current,
-          ].slice(0, 10),
-        )
+        addHistoryEntry(repeatedExpression, repeated)
       } catch (caught) {
         setError(
           caught instanceof Error ? caught.message : 'Unable to calculate.',
@@ -216,16 +223,7 @@ function Calculator() {
           ? { operator: lastOperator, operand: lastNumber }
           : null,
       )
-      setHistory((current) =>
-        [
-          {
-            id: ++historyId.current,
-            expression: shownExpression || formatNumber(calculated),
-            result: calculated,
-          },
-          ...current,
-        ].slice(0, 10),
-      )
+      addHistoryEntry(shownExpression || formatNumber(calculated), calculated)
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'Unable to calculate.')
     }
@@ -307,6 +305,7 @@ function Calculator() {
   }
 
   const useHistoryResult = (value: number) => {
+    setMode('standard')
     setTokens([])
     setEntry(String(value))
     setEntryActive(false)
@@ -328,6 +327,7 @@ function Calculator() {
       ) {
         return
       }
+      if (mode !== 'standard') return
 
       const digit = /^[0-9]$/.test(event.key)
       if (digit) enterDigit(event.key)
@@ -353,6 +353,16 @@ function Calculator() {
     : result !== null
       ? formatNumber(result)
       : entry
+  const historyPanel = historyOpen ? (
+    <div id="calculation-history">
+      <CalculationHistory
+        entries={history}
+        onSelect={useHistoryResult}
+        onClear={() => setHistory([])}
+        onClose={() => setHistoryOpen(false)}
+      />
+    </div>
+  ) : null
 
   return (
     <main className="app-shell">
@@ -382,11 +392,64 @@ function Calculator() {
         </button>
       </header>
 
-      <section className="calculator-layout" aria-label="ClearCalc calculator">
+      <nav className="mode-tabs" role="tablist" aria-label="Calculator mode">
+        {(
+          [
+            ['standard', 'Standard'],
+            ['scientific', 'Scientific'],
+            ['function', 'Function'],
+          ] as const
+        ).map(([value, label]) => (
+          <button
+            key={value}
+            id={`${value}-mode-tab`}
+            type="button"
+            role="tab"
+            aria-selected={mode === value}
+            aria-controls={mode === value ? `${value}-mode-panel` : undefined}
+            className={mode === value ? 'mode-tab mode-tab--active' : 'mode-tab'}
+            onClick={() => setMode(value)}
+            onKeyDown={(event) => {
+              if (
+                !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)
+              ) {
+                return
+              }
+              event.preventDefault()
+              const tabs = Array.from(
+                event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>(
+                  '[role="tab"]',
+                ) ?? [],
+              )
+              const currentIndex = tabs.indexOf(event.currentTarget)
+              const nextIndex =
+                event.key === 'Home'
+                  ? 0
+                  : event.key === 'End'
+                    ? tabs.length - 1
+                    : (currentIndex +
+                        (event.key === 'ArrowRight' ? 1 : tabs.length - 1)) %
+                      tabs.length
+              const nextMode = modeOrder[nextIndex]
+              if (nextMode) setMode(nextMode)
+              tabs[nextIndex]?.focus()
+            }}
+          >
+            {label}
+          </button>
+        ))}
+      </nav>
+
+      <section
+        id="standard-mode-panel"
+        className={`calculator-layout${mode !== 'standard' ? ' calculator-layout--hidden' : ''}`}
+        role="tabpanel"
+        aria-labelledby="standard-mode-tab"
+        aria-label="ClearCalc calculator"
+      >
         <div className="calculator-card">
           <div className="card-heading">
             <div>
-              <p className="eyebrow">EVERYDAY MATH, MADE SIMPLE</p>
               <h1>Calculator</h1>
             </div>
             <span
@@ -463,26 +526,40 @@ function Calculator() {
             </CalculatorButton>
           </div>
 
-          <footer className="calculator-footer">
-            <span>Thoughtfully precise.</span>
-            <span className="keyboard-hint">
-              <kbd>Enter</kbd> to calculate
-            </span>
-          </footer>
         </div>
 
-        {historyOpen && (
-          <div id="calculation-history">
-            <CalculationHistory
-              entries={history}
-              onSelect={useHistoryResult}
-              onClear={() => setHistory([])}
-              onClose={() => setHistoryOpen(false)}
-            />
-          </div>
-        )}
+        {mode === 'standard' && historyPanel}
       </section>
-      <p className="page-note">A little more clarity in every calculation.</p>
+      {mode === 'scientific' && (
+        <section
+          id="scientific-mode-panel"
+          className="calculator-layout mode-layout"
+          role="tabpanel"
+          aria-labelledby="scientific-mode-tab"
+        >
+          <ScientificCalculator
+            angleMode={angleMode}
+            onAngleModeChange={setAngleMode}
+            onCalculation={addHistoryEntry}
+          />
+          {historyPanel}
+        </section>
+      )}
+      {mode === 'function' && (
+        <section
+          id="function-mode-panel"
+          className="calculator-layout mode-layout"
+          role="tabpanel"
+          aria-labelledby="function-mode-tab"
+        >
+          <FunctionCalculator
+            angleMode={angleMode}
+            onAngleModeChange={setAngleMode}
+            onCalculation={addHistoryEntry}
+          />
+          {historyPanel}
+        </section>
+      )}
     </main>
   )
 }

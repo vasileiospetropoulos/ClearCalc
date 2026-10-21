@@ -75,4 +75,34 @@ describe('Calculator', () => {
       'Enter a number to complete the calculation.',
     )
   })
+
+  it('switches to scientific mode and evaluates a supported expression', async () => {
+    render(<Calculator />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('tab', { name: 'Scientific' }))
+    await user.type(
+      screen.getByRole('textbox', { name: 'Expression' }),
+      'sqrt(9)+2^3',
+    )
+    await user.click(screen.getByRole('button', { name: 'Calculate' }))
+    expect(screen.getByText('Result').parentElement).toHaveTextContent('11')
+    expect(screen.getByRole('button', { name: 'History 1' })).toBeInTheDocument()
+  })
+
+  it('evaluates an f(x) definition with implicit multiplication', async () => {
+    render(<Calculator />)
+    const user = userEvent.setup()
+    await user.click(screen.getByRole('tab', { name: 'Function' }))
+    const definition = screen.getByRole('textbox', { name: 'Function definition' })
+    await user.clear(definition)
+    await user.type(definition, 'f(x) = 2x + 1')
+    const xValue = screen.getByRole('spinbutton', { name: 'Value of x' })
+    await user.clear(xValue)
+    await user.type(xValue, '3')
+    await user.click(screen.getByRole('button', { name: 'Evaluate' }))
+    expect(screen.getByText('Function result').parentElement).toHaveTextContent(
+      'f(3) = 7',
+    )
+    expect(screen.getByRole('button', { name: 'History 1' })).toBeInTheDocument()
+  })
 })

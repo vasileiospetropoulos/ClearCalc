@@ -21,7 +21,6 @@ function CalculationHistory({
     <aside className="history" aria-label="Calculation history">
       <div className="history__header">
         <div>
-          <p className="eyebrow">YOUR WORKSPACE</p>
           <h2>History</h2>
         </div>
         <button
