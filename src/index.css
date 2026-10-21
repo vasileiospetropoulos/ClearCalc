@@ -1,0 +1,61 @@
+:root {
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  color: #f4f6fb;
+  background: #101216;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --color-bg: #101216;
+  --color-surface: #191c23;
+  --color-surface-raised: #222630;
+  --color-button: #272b35;
+  --color-button-hover: #343946;
+  --color-text: #f4f6fb;
+  --color-muted: #9198a8;
+  --color-line: #303540;
+  --color-accent: #a9b9ff;
+  --color-accent-strong: #7189f5;
+  --color-danger: #ff8989;
+  --radius-card: 28px;
+  --radius-control: 16px;
+  --shadow-card: 0 24px 80px rgb(0 0 0 / 34%);
+  --transition-fast: 140ms ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+}
+
+button {
+  font: inherit;
+}
+
+button:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
