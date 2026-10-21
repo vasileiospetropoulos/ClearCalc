@@ -9,6 +9,7 @@ ClearCalc is a polished, responsive calculator and compact mathematical toolkit.
 - Decimal input, sign toggle, backspace, clear-entry, and all-clear controls.
 - Repeated equals operations and a reusable list of the 10 most recent calculations.
 - Scientific mode with roots, powers, factorials, logarithms, trigonometry, constants, and degree/radian selection.
+- On-screen scientific keypad for digits, arithmetic, parentheses, editing, constants, and exponent input.
 - Function mode for defining and evaluating expressions such as `f(x) = x^2 + 3x + 2`.
 - Safe expression parsing with parentheses, operator precedence, and implicit multiplication.
 - Keyboard controls, screen-reader labels, visible focus indicators, and reduced-motion support.
@@ -56,6 +57,7 @@ clear-calc/
 │   │   ├── Calculator.tsx
 │   │   ├── CalculatorButton.tsx
 │   │   ├── CalculatorDisplay.tsx
+│   │   ├── ExampleFunctionSelect.tsx
 │   │   ├── FunctionCalculator.tsx
 │   │   └── ScientificCalculator.tsx
 │   ├── test/
@@ -86,6 +88,8 @@ Scientific mode supports square, cube, and general roots; powers; reciprocal; ab
 Function mode evaluates a single-variable `x` expression. It supports explicit operations and implicit multiplication (for example, `3x`), parentheses, constants, and the same supported mathematical functions. Expressions are parsed by a restricted TypeScript parser; arbitrary JavaScript is not evaluated. Unsupported syntax, invalid domains, and undefined results display an error.
 
 The parser and scientific functions are implemented locally; no third-party math-expression dependency is required.
+
+Scientific Mode includes a clickable keypad that edits the expression field directly, so calculations can be entered without a physical keyboard. The Function Mode example picker is a compact keyboard-accessible listbox.
 
 ## Accessibility and responsive design
 

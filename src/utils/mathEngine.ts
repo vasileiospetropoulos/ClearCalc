@@ -11,6 +11,7 @@ const functions = new Set([
   'cbrt',
   'root',
   'abs',
+  'factorial',
   'ln',
   'log',
   'log10',
@@ -62,6 +63,8 @@ function applyFunction(
       return Math.cbrt(argument)
     case 'abs':
       return Math.abs(argument)
+    case 'factorial':
+      return factorial(argument)
     case 'ln':
       if (argument <= 0) throw new Error('Natural logarithm requires a value greater than 0.')
       return Math.log(argument)

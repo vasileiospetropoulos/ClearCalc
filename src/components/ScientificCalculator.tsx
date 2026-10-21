@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { evaluateExpression, type AngleMode } from '../utils/mathEngine'
 import { formatNumber } from '../utils/formatNumber'
 
@@ -17,6 +17,7 @@ function ScientificCalculator({
   const [result, setResult] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [degree, setDegree] = useState('3')
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const calculate = (value = expression) => {
     try {
@@ -34,8 +35,45 @@ function ScientificCalculator({
     }
   }
 
+  const updateExpression = (update: (current: string) => string) => {
+    setExpression((current) => update(current))
+    setError(null)
+    setResult(null)
+  }
+
+  const appendInput = (value: string) => {
+    updateExpression((current) => {
+      if (value === '.') {
+        const currentNumber = current.split(/[+\-*/^(),]/).at(-1) ?? ''
+        if (currentNumber.includes('.')) return current
+        return current + (currentNumber === '' ? '0.' : '.')
+      }
+      return current + value
+    })
+  }
+
   const apply = (operation: string, suffix = '') => {
     const value = expression.trim() || '0'
+    if (operation === 'constant') {
+      appendInput(suffix)
+      return
+    }
+    if (operation === 'nthRoot' && !expression.trim()) {
+      updateExpression(() => 'root(')
+      return
+    }
+    if (operation === 'reciprocal' && !expression.trim()) {
+      updateExpression(() => '1/(')
+      return
+    }
+    if (operation === 'factorial' && !expression.trim()) {
+      updateExpression(() => 'factorial(')
+      return
+    }
+    if (['sqrt', 'cbrt', 'abs', 'ln', 'log', 'exp', 'sin', 'cos', 'tan', 'asin', 'acos', 'atan'].includes(operation) && !expression.trim()) {
+      updateExpression(() => `${operation}(`)
+      return
+    }
     const next =
       operation === 'square'
         ? `(${value})^2`
@@ -47,11 +85,7 @@ function ScientificCalculator({
               ? `(${value})!`
               : operation === 'nthRoot'
                 ? `root(${value},${degree})`
-                : operation === 'constant'
-                  ? expression.trim()
-                    ? `(${expression.trim()})*${suffix}`
-                    : suffix
-                  : `${operation}(${value})`
+                : `${operation}(${value})`
     setExpression(next)
     calculate(next)
   }
@@ -75,6 +109,96 @@ function ScientificCalculator({
     { label: 'Inverse cosine', text: 'acos', action: 'acos' },
     { label: 'Inverse tangent', text: 'atan', action: 'atan' },
   ]
+
+  const keypad = [
+    { label: 'All clear', text: 'AC', action: 'clear', kind: 'utility' },
+    { label: 'Clear entry', text: 'CE', action: 'clearEntry', kind: 'utility' },
+    { label: 'Backspace', text: '⌫', action: 'backspace', kind: 'utility' },
+    { label: 'Open parenthesis', text: '(', action: '(', kind: 'operator' },
+    { label: 'Close parenthesis', text: ')', action: ')', kind: 'operator' },
+    { label: '7', text: '7', action: '7', kind: 'number' },
+    { label: '8', text: '8', action: '8', kind: 'number' },
+    { label: '9', text: '9', action: '9', kind: 'number' },
+    { label: 'Divide', text: '÷', action: '/', kind: 'operator' },
+    { label: 'Multiply', text: '×', action: '*', kind: 'operator' },
+    { label: '4', text: '4', action: '4', kind: 'number' },
+    { label: '5', text: '5', action: '5', kind: 'number' },
+    { label: '6', text: '6', action: '6', kind: 'number' },
+    { label: 'Subtract', text: '−', action: '-', kind: 'operator' },
+    { label: 'Add', text: '+', action: '+', kind: 'operator' },
+    { label: '1', text: '1', action: '1', kind: 'number' },
+    { label: '2', text: '2', action: '2', kind: 'number' },
+    { label: '3', text: '3', action: '3', kind: 'number' },
+    { label: 'Decimal point', text: '.', action: '.', kind: 'number' },
+    { label: 'Equals', text: '=', action: 'equals', kind: 'equals' },
+    { label: '0', text: '0', action: '0', kind: 'number' },
+    { label: 'Insert π', text: 'π', action: 'pi', kind: 'constant' },
+    { label: 'Insert e', text: 'e', action: 'e', kind: 'constant' },
+    { label: 'Comma', text: ',', action: ',', kind: 'operator' },
+    { label: 'Exponent', text: 'xʸ', action: '^', kind: 'operator' },
+  ]
+
+  const keypadAction = (action: string) => {
+    if (action === 'clear') {
+      setExpression('')
+      setResult(null)
+      setError(null)
+    } else if (action === 'clearEntry') {
+      updateExpression((current) => {
+        const splitAt = Math.max(
+          current.lastIndexOf('+'),
+          current.lastIndexOf('-'),
+          current.lastIndexOf('*'),
+          current.lastIndexOf('/'),
+          current.lastIndexOf('^'),
+          current.lastIndexOf('('),
+          current.lastIndexOf(','),
+        )
+        return current.slice(0, splitAt + 1)
+      })
+    } else if (action === 'backspace') {
+      updateExpression((current) => current.slice(0, -1))
+    } else if (action === 'equals') {
+      calculate()
+    } else {
+      appendInput(action)
+    }
+    window.requestAnimationFrame(() => inputRef.current?.focus())
+  }
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
+      ) {
+        return
+      }
+
+      if (/^[0-9]$/.test(event.key)) keypadAction(event.key)
+      else if (event.key === '.') keypadAction('.')
+      else if (event.key === ',') keypadAction(',')
+      else if (event.key === '+') keypadAction('+')
+      else if (event.key === '-') keypadAction('-')
+      else if (event.key === '*') keypadAction('*')
+      else if (event.key === '/') keypadAction('/')
+      else if (event.key === '^') keypadAction('^')
+      else if (event.key === '(' || event.key === ')') keypadAction(event.key)
+      else if (event.key === 'Backspace' || event.key === 'Delete') {
+        keypadAction('backspace')
+      } else if (event.key === 'Escape') keypadAction('clear')
+      else if (event.key === 'Enter' || event.key === '=') {
+        keypadAction('equals')
+      } else return
+
+      event.preventDefault()
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  })
 
   return (
     <section className="mode-card scientific-card" aria-labelledby="scientific-title">
@@ -103,6 +227,7 @@ function ScientificCalculator({
       <div className="expression-entry">
         <input
           id="scientific-expression"
+          ref={inputRef}
           type="text"
           inputMode="text"
           autoComplete="off"
@@ -112,6 +237,7 @@ function ScientificCalculator({
           onChange={(event) => {
             setExpression(event.target.value)
             setError(null)
+            setResult(null)
           }}
           onKeyDown={(event) => {
             if (event.key === 'Enter') calculate()
@@ -151,7 +277,10 @@ function ScientificCalculator({
             key={item.action}
             type="button"
             aria-label={item.label}
-            onClick={() => apply(item.action)}
+            onClick={() => {
+              apply(item.action)
+              window.requestAnimationFrame(() => inputRef.current?.focus())
+            }}
           >
             {item.text}
           </button>
@@ -160,14 +289,26 @@ function ScientificCalculator({
           type="button"
           aria-label="General exponentiation"
           onClick={() => {
-            const value = expression.trim() || '0'
-            const next = `(${value})^${degree}`
-            setExpression(next)
-            calculate(next)
+            appendInput('^')
+            window.requestAnimationFrame(() => inputRef.current?.focus())
           }}
         >
           xʸ
         </button>
+      </div>
+
+      <div className="scientific-keypad" role="group" aria-label="Scientific numeric keypad">
+        {keypad.map((key) => (
+          <button
+            key={key.label}
+            type="button"
+            className={`scientific-key scientific-key--${key.kind}${key.action === '0' ? ' scientific-key--zero' : ''}`}
+            aria-label={key.label}
+            onClick={() => keypadAction(key.action)}
+          >
+            {key.text}
+          </button>
+        ))}
       </div>
 
       <div className={`mode-result${error ? ' mode-result--error' : ''}`} aria-live="polite">

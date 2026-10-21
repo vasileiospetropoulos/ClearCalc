@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { evaluateExpression, type AngleMode } from '../utils/mathEngine'
 import { formatNumber } from '../utils/formatNumber'
+import ExampleFunctionSelect, {
+  type FunctionExample,
+} from './ExampleFunctionSelect'
 
 type FunctionCalculatorProps = {
   angleMode: AngleMode
@@ -8,7 +11,7 @@ type FunctionCalculatorProps = {
   onCalculation: (expression: string, result: number) => void
 }
 
-const examples = [
+const examples: FunctionExample[] = [
   { label: 'Quadratic', expression: 'f(x) = x^2 + 3x + 2', x: '2' },
   { label: 'Linear', expression: 'f(x) = 2x + 1', x: '3' },
   { label: 'Sine', expression: 'f(x) = sin(x)', x: '90' },
@@ -77,31 +80,19 @@ function FunctionCalculator({
         ))}
       </fieldset>
 
-      <label className="field-label" htmlFor="function-example">
+      <label className="field-label" id="function-example-label" htmlFor="function-example">
         Start with an example
       </label>
-      <select
-        id="function-example"
-        value=""
-        onChange={(event) => {
-          const example = examples[Number(event.target.value)]
-          if (!example) return
+      <ExampleFunctionSelect
+        examples={examples}
+        onSelect={(example) => {
           setFunctionDefinition(example.expression)
           setInputValue(example.x)
           setResult(null)
           setError(null)
           setEvaluatedAt(null)
         }}
-      >
-        <option value="" disabled>
-          Choose an example function
-        </option>
-        {examples.map((example, index) => (
-          <option key={example.label} value={index}>
-            {example.label}: {example.expression}
-          </option>
-        ))}
-      </select>
+      />
 
       <label className="field-label" htmlFor="function-definition">
         Function definition
