@@ -2,6 +2,14 @@
 
 ClearCalc is a responsive calculator for standard arithmetic, scientific operations, and mathematical function evaluation. It is available as a React, TypeScript, and Vite web application and as an installable Windows desktop application packaged with Tauri 2.
 
+<p align="center">
+  <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe">
+    <img src="https://img.shields.io/badge/Download-ClearCalc%20for%20Windows-6366F1?style=for-the-badge&amp;logo=windows&amp;logoColor=white" alt="Download ClearCalc for Windows">
+  </a>
+  <br>
+  <sub><a href="https://github.com/vasileiospetropoulos/ClearCalc/releases">View All Releases</a></sub>
+</p>
+
 ## Contents
 
 - [Features](#features)
