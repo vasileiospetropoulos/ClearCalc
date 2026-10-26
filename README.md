@@ -1,21 +1,49 @@
 # ClearCalc
 
-ClearCalc is a responsive calculator for standard arithmetic, scientific operations, and mathematical function evaluation. It is available as a React, TypeScript, and Vite web application and as an installable Windows desktop application packaged with Tauri 2.
+ClearCalc is a responsive calculator for standard arithmetic, scientific operations, and mathematical function evaluation. It is available as a React, TypeScript, and Vite web application, and as Windows and macOS desktop applications packaged with Tauri 2.
 
 <p align="center">
   <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe">
-    <img src="https://img.shields.io/badge/Download-ClearCalc%20for%20Windows-6366F1?style=for-the-badge&amp;logo=windows&amp;logoColor=white" alt="Download ClearCalc for Windows">
+    <img
+      src="https://img.shields.io/badge/Download-ClearCalc%20for%20Windows-6366F1?style=for-the-badge&amp;logo=windows&amp;logoColor=white"
+      alt="Download ClearCalc for Windows"
+    >
+  </a>
+  <br>
+  <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_aarch64.dmg">
+    <img
+      src="https://img.shields.io/badge/Download-macOS%20Apple%20Silicon-6366F1?style=for-the-badge&amp;logo=apple&amp;logoColor=white"
+      alt="Download ClearCalc for macOS on Apple Silicon"
+    >
+  </a>
+  <br>
+  <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64.dmg">
+    <img
+      src="https://img.shields.io/badge/Download-macOS%20Intel-6366F1?style=for-the-badge&amp;logo=apple&amp;logoColor=white"
+      alt="Download ClearCalc for macOS on Intel"
+    >
   </a>
   <br>
   <sub><a href="https://github.com/vasileiospetropoulos/ClearCalc/releases">View All Releases</a></sub>
 </p>
 
+### Downloads
+
+- **Windows x64 installer:** [ClearCalc_1.0.0_x64-setup.exe](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe)
+- **macOS — Apple Silicon:** [ClearCalc_1.0.0_aarch64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_aarch64.dmg)
+- **macOS — Intel:** [ClearCalc_1.0.0_x64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64.dmg)
+
+Apple Silicon is for Macs with Apple M-series processors; the Intel DMG is for Intel-based Macs.
+
 ## Contents
 
+- [Downloads](#downloads)
 - [Features](#features)
 - [Technology](#technology)
 - [Windows desktop application](#windows-desktop-application)
+- [macOS desktop application](#macos-desktop-application)
 - [Install the Windows application](#install-the-windows-application)
+- [Install the macOS application](#install-the-macos-application)
 - [Development setup](#development-setup)
 - [Commands](#commands)
 - [Project structure](#project-structure)
@@ -59,7 +87,7 @@ Function expressions support arithmetic, parentheses, powers, roots, logarithms,
 
 - **React 19** and **TypeScript 6** provide the calculator interface and application logic.
 - **Vite 8** builds and serves the web frontend.
-- **Tauri 2** wraps the same frontend for Windows desktop distribution; its application shell is implemented in Rust.
+- **Tauri 2** wraps the same frontend for Windows and macOS desktop distribution; its application shell is implemented in Rust.
 - **Vitest 5**, Testing Library, and jsdom are used for automated tests. **oxlint** is used for linting.
 
 ## Windows desktop application
@@ -85,17 +113,32 @@ Run `npm run tauri:build` to build the frontend and create the installer. The in
 
 The app uses the Microsoft Edge WebView2 Runtime to display its interface. Tauri's default `downloadBootstrapper` installation mode is in effect: if WebView2 is not already available, the installer downloads and runs its bootstrapper. Windows 10 and later commonly include the runtime.
 
+## macOS desktop application
+
+The macOS desktop app uses the same React frontend, packaged with Tauri 2 as separate architecture-specific DMGs:
+
+| Mac processor | Rust target | Release download |
+| --- | --- | --- |
+| Apple Silicon (Apple M-series) | `aarch64-apple-darwin` | [ClearCalc_1.0.0_aarch64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_aarch64.dmg) |
+| Intel | `x86_64-apple-darwin` | [ClearCalc_1.0.0_x64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64.dmg) |
+
+These DMGs were built by the [GitHub Actions macOS workflow](.github/workflows/macos-build.yml). Both architecture jobs completed successfully, including the automated checks for DMG integrity, app bundle presence, `Info.plist` validity, and executable presence and permissions in the [successful workflow run](https://github.com/vasileiospetropoulos/ClearCalc/actions/runs/40307866542). These checks validate package contents, not GUI behavior. ClearCalc has not yet been interactively tested on physical Mac hardware. The v1.0.0 release provides Windows and macOS packages; it does not include a Linux package.
+
+The macOS builds are not signed with an Apple Developer ID and are not notarized by Apple. macOS may display security warnings when opening them. Download the DMGs only from the [official ClearCalc v1.0.0 release](https://github.com/vasileiospetropoulos/ClearCalc/releases/tag/v1.0.0); do not bypass a security warning unless you understand and trust the source and the action being taken.
+
 ## Install the Windows application
 
-These instructions are for someone who already has a ClearCalc installer from the project maintainer or another trusted distribution source:
-
-1. Obtain `ClearCalc_1.0.0_x64-setup.exe` from that source.
-2. Run the installer and follow its prompts. The configured NSIS install mode installs for the current Windows user.
-3. Launch ClearCalc from the Start menu.
+Download the [Windows x64 installer](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe) from the official v1.0.0 release or another trusted source, run it, and follow its prompts. The configured NSIS install mode installs for the current Windows user. Launch ClearCalc from the Start menu.
 
 The packaged application does not require VS Code, Node.js, npm, Rust, or a manually started development server. WebView2 is required; the installer uses Tauri's bootstrapper mode if the runtime is missing.
 
-No GitHub Release download link is provided here; use only an installer obtained from a source you trust.
+## Install the macOS application
+
+1. Download the DMG for your Mac from the [official ClearCalc v1.0.0 release](https://github.com/vasileiospetropoulos/ClearCalc/releases/tag/v1.0.0): choose the Apple Silicon build for an M-series Mac or the Intel build for an Intel Mac.
+2. Open the DMG and inspect its contents.
+3. Follow the installation layout provided in the mounted disk image to install or launch ClearCalc.
+
+These instructions describe the package installation flow; installation and launch have not been verified on physical Mac hardware. The first launch may show a macOS security warning because the build is not Developer ID signed or notarized. Only proceed if the installer came from the official repository and you understand the warning.
 
 ## Development setup
 
@@ -128,6 +171,10 @@ In addition to the web prerequisites, building or running the Tauri desktop app 
 
 See the official [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/) for current platform setup details.
 
+### macOS desktop development
+
+For local macOS desktop development, install Node.js and npm, Rust and Cargo, and Xcode Command Line Tools. Tauri's [macOS prerequisites](https://v2.tauri.app/start/prerequisites/#macos) describe the current setup. Alternatively, the architecture-specific release DMGs are built in GitHub Actions using the manual **Build macOS DMGs** workflow.
+
 ## Commands
 
 Run these commands from the repository root:
@@ -143,7 +190,7 @@ Run these commands from the repository root:
 | `npm run tauri:dev` | Start Vite and open the Tauri desktop app in development mode. |
 | `npm run tauri:build` | Build the production frontend and the Windows x64 NSIS installer. |
 
-The desktop development command uses the configured Vite development URL. The production installer instead bundles the `dist/` frontend output.
+The desktop development command uses the configured Vite development URL. `npm run tauri:build` builds the Windows x64 NSIS installer. To build macOS DMGs, manually run **Build macOS DMGs** from the repository's GitHub Actions tab; the workflow builds the production frontend and bundles it for both macOS architectures.
 
 ## Project structure
 
@@ -161,14 +208,14 @@ The desktop development command uses the configured Vite development URL. The pr
 │   ├── icons/                # Desktop application icons and ClearCalc icon source
 │   ├── src/                  # Rust entry point and Tauri application setup
 │   ├── Cargo.toml
-│   └── tauri.conf.json       # Window, frontend, and Windows bundler configuration
+│   └── tauri.conf.json       # Window, frontend, and bundler configuration
 ├── package.json              # Dependencies and npm scripts
 ├── package-lock.json
 ├── vite.config.ts
 └── README.md
 ```
 
-The React components implement the UI and interactions. The calculator arithmetic and restricted mathematical expression parser are in `src/utils/`. Tauri packages the frontend and provides the Windows desktop window.
+The React components implement the UI and interactions. The calculator arithmetic and restricted mathematical expression parser are in `src/utils/`. Tauri packages the frontend and provides the desktop application window.
 
 ## Testing and verification
 
@@ -182,7 +229,7 @@ npm run lint
 npm run build
 ```
 
-At the time of this README update, these checks pass: 30 tests, lint, and the web production build. They validate the frontend; they do not by themselves verify an installed Windows application. To verify the packaged app, build it with `npm run tauri:build`, install the resulting NSIS executable, and test the calculator modes and window resizing on Windows.
+At the time of this README update, these checks pass: 30 tests, lint, and the web production build. They validate the frontend; they do not by themselves verify an installed desktop application. The macOS DMGs have passed the automated package-integrity checks described above, but have not been tested interactively on physical Mac hardware. To verify the Windows app, build it with `npm run tauri:build`, install the resulting NSIS executable, and test the calculator modes and window resizing on Windows.
 
 ## Expression handling
 
