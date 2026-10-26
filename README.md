@@ -5,7 +5,7 @@ ClearCalc is a responsive calculator for standard arithmetic, scientific operati
 <p align="center">
   <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe">
     <img
-      src="https://img.shields.io/badge/Download-ClearCalc%20for%20Windows-6366F1?style=for-the-badge&amp;logo=windows&amp;logoColor=white"
+      src="https://img.shields.io/badge/Download-ClearCalc%20for%20Windows-6366F1?style=for-the-badge&amp;logo=data:image%2Fsvg%2Bxml%3Butf8%2C%253Csvg%2520xmlns%253D%2522http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2522%2520viewBox%253D%25220%25200%252024%252024%2522%253E%253Cpath%2520fill%253D%2522white%2522%2520d%253D%2522M0%252C0H11.377V11.372H0ZM12.623%252C0H24V11.372H12.623ZM0%252C12.623H11.377V24H0Zm12.623%252C0H24V24H12.623%2522%252F%253E%253C%252Fsvg%253E&amp;logoColor=white"
       alt="Download ClearCalc for Windows"
     >
   </a>
@@ -27,17 +27,8 @@ ClearCalc is a responsive calculator for standard arithmetic, scientific operati
   <sub><a href="https://github.com/vasileiospetropoulos/ClearCalc/releases">View All Releases</a></sub>
 </p>
 
-### Downloads
-
-- **Windows x64 installer:** [ClearCalc_1.0.0_x64-setup.exe](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe)
-- **macOS — Apple Silicon:** [ClearCalc_1.0.0_aarch64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_aarch64.dmg)
-- **macOS — Intel:** [ClearCalc_1.0.0_x64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64.dmg)
-
-Apple Silicon is for Macs with Apple M-series processors; the Intel DMG is for Intel-based Macs.
-
 ## Contents
 
-- [Downloads](#downloads)
 - [Features](#features)
 - [Technology](#technology)
 - [Windows desktop application](#windows-desktop-application)
