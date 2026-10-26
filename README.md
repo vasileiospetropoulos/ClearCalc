@@ -1,6 +1,6 @@
 # ClearCalc
 
-ClearCalc is a responsive calculator for standard arithmetic, scientific operations, and mathematical function evaluation. It is available as a React, TypeScript, and Vite web application, and as Windows and macOS desktop applications packaged with Tauri 2.
+ClearCalc is a responsive calculator for standard arithmetic, scientific operations, and mathematical function evaluation. It is available as a React, TypeScript, and Vite web application; as a Windows desktop application packaged with Tauri 2; as macOS desktop applications for Apple Silicon and Intel packaged with Tauri 2; and as Linux x64 AppImage and Debian packages.
 
 <p align="center">
   <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe">
@@ -24,6 +24,20 @@ ClearCalc is a responsive calculator for standard arithmetic, scientific operati
     >
   </a>
   <br>
+  <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_amd64.AppImage">
+    <img
+      src="https://img.shields.io/badge/Download-Linux%20AppImage-6366F1?style=for-the-badge&amp;logo=linux&amp;logoColor=white"
+      alt="Download the ClearCalc Linux x64 AppImage"
+    >
+  </a>
+  <br>
+  <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_amd64.deb">
+    <img
+      src="https://img.shields.io/badge/Download-Linux%20DEB-6366F1?style=for-the-badge&amp;logo=linux&amp;logoColor=white"
+      alt="Download the ClearCalc Linux x64 Debian package"
+    >
+  </a>
+  <br>
   <sub><a href="https://github.com/vasileiospetropoulos/ClearCalc/releases">View All Releases</a></sub>
 </p>
 
@@ -33,8 +47,10 @@ ClearCalc is a responsive calculator for standard arithmetic, scientific operati
 - [Technology](#technology)
 - [Windows desktop application](#windows-desktop-application)
 - [macOS desktop application](#macos-desktop-application)
+- [Linux desktop application](#linux-desktop-application)
 - [Install the Windows application](#install-the-windows-application)
 - [Install the macOS application](#install-the-macos-application)
+- [Install the Linux application](#install-the-linux-application)
 - [Development setup](#development-setup)
 - [Commands](#commands)
 - [Project structure](#project-structure)
@@ -78,7 +94,7 @@ Function expressions support arithmetic, parentheses, powers, roots, logarithms,
 
 - **React 19** and **TypeScript 6** provide the calculator interface and application logic.
 - **Vite 8** builds and serves the web frontend.
-- **Tauri 2** wraps the same frontend for Windows and macOS desktop distribution; its application shell is implemented in Rust.
+- **Tauri 2** wraps the same frontend for Windows, macOS, and Linux desktop distribution; its application shell is implemented in Rust.
 - **Vitest 5**, Testing Library, and jsdom are used for automated tests. **oxlint** is used for linting.
 
 ## Windows desktop application
@@ -113,9 +129,22 @@ The macOS desktop app uses the same React frontend, packaged with Tauri 2 as sep
 | Apple Silicon (Apple M-series) | `aarch64-apple-darwin` | [ClearCalc_1.0.0_aarch64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_aarch64.dmg) |
 | Intel | `x86_64-apple-darwin` | [ClearCalc_1.0.0_x64.dmg](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64.dmg) |
 
-These DMGs were built by the [GitHub Actions macOS workflow](.github/workflows/macos-build.yml). Both architecture jobs completed successfully, including the automated checks for DMG integrity, app bundle presence, `Info.plist` validity, and executable presence and permissions in the [successful workflow run](https://github.com/vasileiospetropoulos/ClearCalc/actions/runs/40307866542). These checks validate package contents, not GUI behavior. ClearCalc has not yet been interactively tested on physical Mac hardware. The v1.0.0 release provides Windows and macOS packages; it does not include a Linux package.
+These DMGs were built by the [GitHub Actions macOS workflow](.github/workflows/macos-build.yml). Both architecture jobs completed successfully, including the automated checks for DMG integrity, app bundle presence, `Info.plist` validity, and executable presence and permissions in the [successful workflow run](https://github.com/vasileiospetropoulos/ClearCalc/actions/runs/40307866542). These checks validate package contents, not GUI behavior. ClearCalc has not yet been interactively tested on physical Mac hardware.
 
 The macOS builds are not signed with an Apple Developer ID and are not notarized by Apple. macOS may display security warnings when opening them. Download the DMGs only from the [official ClearCalc v1.0.0 release](https://github.com/vasileiospetropoulos/ClearCalc/releases/tag/v1.0.0); do not bypass a security warning unless you understand and trust the source and the action being taken.
+
+## Linux desktop application
+
+The Linux packages use the same React frontend and are built with Tauri 2 for Linux x64 (`amd64`):
+
+| Format | File | Release download |
+| --- | --- | --- |
+| AppImage (portable package) | `ClearCalc_1.0.0_amd64.AppImage` | [Download AppImage](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_amd64.AppImage) |
+| Debian package | `ClearCalc_1.0.0_amd64.deb` | [Download Debian package](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_amd64.deb) |
+
+The AppImage is a portable package format. The `.deb` is intended for compatible Debian-based distributions such as Ubuntu and Linux Mint, subject to the dependencies supported by the user's system. These packages do not imply support for every Linux distribution.
+
+Both formats are generated on an Ubuntu 22.04 runner by the manually triggered [GitHub Actions Linux workflow](.github/workflows/linux-build.yml), which uploads them as separate workflow artifacts. In the [successful Linux workflow run](https://github.com/vasileiospetropoulos/ClearCalc/actions/runs/40316311722), the workflow confirmed that exactly one non-empty package of each format was produced, checked Debian package metadata with `dpkg-deb --info`, and reported the AppImage file type. It also launched the AppImage with `xvfb-run` under a virtual X display and confirmed that its process remained running for five seconds; the launch check is bounded by a 20-second timeout. These checks verify package presence and metadata plus a headless startup only; they do not verify all calculator features or replace interactive testing on a Linux desktop.
 
 ## Install the Windows application
 
@@ -130,6 +159,36 @@ The packaged application does not require VS Code, Node.js, npm, Rust, or a manu
 3. Follow the installation layout provided in the mounted disk image to install or launch ClearCalc.
 
 These instructions describe the package installation flow; installation and launch have not been verified on physical Mac hardware. The first launch may show a macOS security warning because the build is not Developer ID signed or notarized. Only proceed if the installer came from the official repository and you understand the warning.
+
+## Install the Linux application
+
+### AppImage
+
+1. Download [`ClearCalc_1.0.0_amd64.AppImage`](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_amd64.AppImage) from the official v1.0.0 release.
+2. Open a terminal in the directory where you downloaded the file.
+3. Mark it executable:
+
+   ```sh
+   chmod +x ClearCalc_1.0.0_amd64.AppImage
+   ```
+
+4. Launch it:
+
+   ```sh
+   ./ClearCalc_1.0.0_amd64.AppImage
+   ```
+
+AppImage execution requirements can vary by distribution and runtime environment. If it does not start, consult your distribution's AppImage and FUSE documentation.
+
+### Debian package
+
+On a compatible Debian-based distribution, download [`ClearCalc_1.0.0_amd64.deb`](https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_amd64.deb) and install it from the download directory:
+
+```sh
+sudo apt install ./ClearCalc_1.0.0_amd64.deb
+```
+
+The package's dependencies must be compatible with your system. Compatibility can vary between distributions and their releases.
 
 ## Development setup
 
@@ -181,7 +240,7 @@ Run these commands from the repository root:
 | `npm run tauri:dev` | Start Vite and open the Tauri desktop app in development mode. |
 | `npm run tauri:build` | Build the production frontend and the Windows x64 NSIS installer. |
 
-The desktop development command uses the configured Vite development URL. `npm run tauri:build` builds the Windows x64 NSIS installer. To build macOS DMGs, manually run **Build macOS DMGs** from the repository's GitHub Actions tab; the workflow builds the production frontend and bundles it for both macOS architectures.
+The desktop development command uses the configured Vite development URL. `npm run tauri:build` builds the configured Windows x64 NSIS installer. macOS DMGs and Linux AppImage/DEB packages are built through their respective manually triggered GitHub Actions workflows: **Build macOS DMGs** and **Build Linux Packages**.
 
 ## Project structure
 
@@ -200,6 +259,8 @@ The desktop development command uses the configured Vite development URL. `npm r
 │   ├── src/                  # Rust entry point and Tauri application setup
 │   ├── Cargo.toml
 │   └── tauri.conf.json       # Window, frontend, and bundler configuration
+├── .github/
+│   └── workflows/            # Manual macOS and Linux package builds
 ├── package.json              # Dependencies and npm scripts
 ├── package-lock.json
 ├── vite.config.ts
@@ -220,7 +281,7 @@ npm run lint
 npm run build
 ```
 
-At the time of this README update, these checks pass: 30 tests, lint, and the web production build. They validate the frontend; they do not by themselves verify an installed desktop application. The macOS DMGs have passed the automated package-integrity checks described above, but have not been tested interactively on physical Mac hardware. To verify the Windows app, build it with `npm run tauri:build`, install the resulting NSIS executable, and test the calculator modes and window resizing on Windows.
+The current frontend checks pass: 30 tests, lint, and the web production build. They validate the frontend; they do not by themselves verify an installed desktop application. The macOS DMGs passed the package-integrity checks described above, but have not been tested interactively on physical Mac hardware. The Linux workflow passed its package checks and headless AppImage launch smoke test described above; this does not verify all calculator features, and the app has not been tested interactively on a physical Linux desktop. To verify the Windows app, build it with `npm run tauri:build`, install the resulting NSIS executable, and test the calculator modes and window resizing on Windows.
 
 ## Expression handling
 
@@ -239,3 +300,5 @@ ClearCalc uses a dark visual theme and responsive layouts across Standard, Scien
 - **A Windows desktop build fails in native compilation:** Confirm that Visual Studio Build Tools has the **Desktop development with C++** workload and the x64 MSVC toolchain and Windows SDK installed.
 - **The NSIS installer is not found after building:** Check that `npm run tauri:build` completed successfully, then inspect `src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/`.
 - **The desktop app cannot display its interface:** Confirm that the WebView2 Runtime is installed. If it is missing, install the [Evergreen WebView2 Runtime](https://developer.microsoft.com/en-us/microsoft-edge/webview2/#download-section) and try again.
+- **An AppImage does not start:** Confirm that the file is executable and check your distribution's AppImage and FUSE requirements.
+- **A `.deb` package reports unmet dependencies:** Confirm that your Debian-based distribution and release provide compatible dependencies; the package is not guaranteed to work on every distribution or older release.
