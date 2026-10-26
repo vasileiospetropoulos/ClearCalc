@@ -44,6 +44,51 @@ jobs:
         env:
           APPLE_SIGNING_IDENTITY: "-"
 
+      - name: Verify macOS DMG contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          dmg_files=(src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg)
+          if [[ ${#dmg_files[@]} -ne 1 ]]; then
+            echo "Expected exactly one DMG for ${{ matrix.target }}, found ${#dmg_files[@]}." >&2
+            exit 1
+          fi
+          dmg="${dmg_files[0]}"
+
+          hdiutil verify "$dmg"
+
+          mount_point="$(mktemp -d)"
+          cleanup() {
+            hdiutil detach -quiet "$mount_point" || hdiutil detach -force -quiet "$mount_point" || true
+            rmdir "$mount_point" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          hdiutil attach "$dmg" -readonly -nobrowse -mountpoint "$mount_point"
+
+          app_bundle="$mount_point/ClearCalc.app"
+          if [[ ! -d "$app_bundle" ]]; then
+            echo "ClearCalc.app was not found in the mounted DMG." >&2
+            exit 1
+          fi
+
+          info_plist="$app_bundle/Contents/Info.plist"
+          plutil -lint "$info_plist"
+
+          executable="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleExecutable' "$info_plist")"
+          if [[ -z "$executable" ]]; then
+            echo "CFBundleExecutable is empty." >&2
+            exit 1
+          fi
+
+          executable_path="$app_bundle/Contents/MacOS/$executable"
+          if [[ ! -f "$executable_path" || ! -x "$executable_path" ]]; then
+            echo "App executable is missing or not executable: $executable_path" >&2
+            exit 1
+          fi
+
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v7
         with:
