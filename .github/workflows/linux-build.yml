@@ -85,6 +85,59 @@ jobs:
           printf 'appimage=%s\n' "${appimages[0]}" >> "$GITHUB_OUTPUT"
           printf 'deb=%s\n' "${debs[0]}" >> "$GITHUB_OUTPUT"
 
+      - name: Install headless GUI test dependency
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends xvfb
+
+      - name: Smoke test AppImage launch
+        shell: bash
+        run: |
+          set -uo pipefail
+
+          log_file="$(mktemp)"
+          trap 'rm -f "$log_file"' EXIT
+
+          set +e
+          timeout --signal=TERM --kill-after=5s 20s \
+            xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" \
+            bash -euo pipefail -c '
+              appimage="$1"
+              log_file="$2"
+
+              setsid "$appimage" >"$log_file" 2>&1 &
+              app_pid=$!
+
+              cleanup_app() {
+                kill -- "-$app_pid" 2>/dev/null || true
+                wait "$app_pid" 2>/dev/null || true
+              }
+              trap cleanup_app EXIT
+
+              sleep 5
+              process_state="$(ps -o stat= -p "$app_pid" 2>/dev/null || true)"
+              if [[ -z "$process_state" || "$process_state" == Z* ]]; then
+                if wait "$app_pid"; then
+                  exit_code=0
+                else
+                  exit_code=$?
+                fi
+                echo "AppImage exited before the 5-second startup check (exit code: $exit_code)." >&2
+                exit 1
+              fi
+            ' _ "${{ steps.verify.outputs.appimage }}" "$log_file"
+          smoke_status=$?
+          set -e
+
+          if [[ -s "$log_file" ]]; then
+            echo "AppImage stdout/stderr:"
+            cat "$log_file"
+          fi
+          if [[ "$smoke_status" -ne 0 ]]; then
+            echo "AppImage headless launch smoke test failed (exit code: $smoke_status)." >&2
+            exit "$smoke_status"
+          fi
+
       - name: Upload AppImage artifact
         uses: actions/upload-artifact@v7
         with:
