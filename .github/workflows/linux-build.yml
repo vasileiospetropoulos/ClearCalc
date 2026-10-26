@@ -1,0 +1,100 @@
+name: Build Linux Packages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-linux:
+    name: Build Linux x64 packages
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install Rust and target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            libwebkit2gtk-4.1-dev \
+            build-essential \
+            curl \
+            wget \
+            file \
+            libxdo-dev \
+            libssl-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            dpkg-dev \
+            libfuse2 \
+            patchelf \
+            xdg-utils
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build Linux packages
+        run: npx tauri build --target x86_64-unknown-linux-gnu --bundles appimage,deb
+
+      - name: Verify Linux packages
+        id: verify
+        shell: bash
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+
+          bundle_dir="src-tauri/target/x86_64-unknown-linux-gnu/release/bundle"
+          appimages=("$bundle_dir"/appimage/*.AppImage)
+          debs=("$bundle_dir"/deb/*.deb)
+
+          if [[ ${#appimages[@]} -ne 1 ]]; then
+            echo "Expected exactly one AppImage, found ${#appimages[@]}." >&2
+            exit 1
+          fi
+          if [[ ! -s "${appimages[0]}" ]]; then
+            echo "AppImage is empty: ${appimages[0]}" >&2
+            exit 1
+          fi
+
+          if [[ ${#debs[@]} -ne 1 ]]; then
+            echo "Expected exactly one Debian package, found ${#debs[@]}." >&2
+            exit 1
+          fi
+          if [[ ! -s "${debs[0]}" ]]; then
+            echo "Debian package is empty: ${debs[0]}" >&2
+            exit 1
+          fi
+
+          dpkg-deb --info "${debs[0]}"
+          file "${appimages[0]}"
+
+          printf 'appimage=%s\n' "${appimages[0]}" >> "$GITHUB_OUTPUT"
+          printf 'deb=%s\n' "${debs[0]}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload AppImage artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ClearCalc-Linux-x64-AppImage
+          path: ${{ steps.verify.outputs.appimage }}
+          if-no-files-found: error
+
+      - name: Upload Debian package artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ClearCalc-Linux-x64-DEB
+          path: ${{ steps.verify.outputs.deb }}
+          if-no-files-found: error
