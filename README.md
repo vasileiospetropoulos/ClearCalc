@@ -1,6 +1,6 @@
 # ClearCalc
 
-ClearCalc is a responsive calculator for standard arithmetic, scientific operations, and mathematical function evaluation. It is available as a React, TypeScript, and Vite web application; as a Windows desktop application packaged with Tauri 2; as macOS desktop applications for Apple Silicon and Intel packaged with Tauri 2; and as Linux x64 AppImage and Debian packages.
+ClearCalc is a responsive calculator for standard arithmetic, scientific operations, and mathematical function evaluation. It is a React, TypeScript, and Vite web application with Tauri 2 desktop packages for Windows, macOS (Apple Silicon and Intel), and Linux x64 in AppImage and Debian formats.
 
 <p align="center">
   <a href="https://github.com/vasileiospetropoulos/ClearCalc/releases/download/v1.0.0/ClearCalc_1.0.0_x64-setup.exe">
@@ -110,7 +110,7 @@ The Windows app uses the existing Vite production build; it is not a separate ca
 | Installer | NSIS setup executable |
 | Install scope | Current user |
 
-The generated installer currently present in this workspace is:
+The Windows installer is generated at the following path:
 
 ```text
 src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/ClearCalc_1.0.0_x64-setup.exe
@@ -223,7 +223,11 @@ See the official [Tauri prerequisites](https://v2.tauri.app/start/prerequisites/
 
 ### macOS desktop development
 
-For local macOS desktop development, install Node.js and npm, Rust and Cargo, and Xcode Command Line Tools. Tauri's [macOS prerequisites](https://v2.tauri.app/start/prerequisites/#macos) describe the current setup. Alternatively, the architecture-specific release DMGs are built in GitHub Actions using the manual **Build macOS DMGs** workflow.
+For local macOS desktop development, install Node.js and npm, Rust and Cargo, and Xcode Command Line Tools. Tauri's [macOS prerequisites](https://v2.tauri.app/start/prerequisites/#macos) describe the current setup. Alternatively, architecture-specific release DMGs are built by the manual **Build macOS DMGs** GitHub Actions workflow.
+
+### Linux desktop development
+
+For local Linux desktop development, install Node.js and npm, Rust and Cargo, and the native libraries required by Tauri. These include WebKitGTK 4.1, build tools, OpenSSL, `libxdo`, Ayatana AppIndicator, and librsvg; package names and availability vary by distribution. See Tauri's [Linux prerequisites](https://v2.tauri.app/start/prerequisites/#linux) for distribution-specific instructions. The existing **Build Linux Packages** GitHub Actions workflow can build Linux x64 AppImage and Debian packages and upload them as downloadable workflow artifacts without changing the application source code. This does not imply support for every Linux distribution.
 
 ## Commands
 
